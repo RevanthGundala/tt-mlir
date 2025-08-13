@@ -7,16 +7,13 @@
 #include "ttmlir/Dialect/TTIR/IR/TTIROps.h"
 #include "ttmlir/Dialect/TTIR/Utils/Utils.h"
 
-#include "llvm/ADT/SmallVector.h"
 #include "mlir/Dialect/Func/Transforms/FuncConversions.h"
 #include "mlir/Dialect/Tosa/IR/TosaOps.h"
 #include "mlir/IR/BuiltinAttributes.h"
 #include "mlir/IR/PatternMatch.h"
-#include "mlir/IR/ValueRange.h"
 #include "mlir/Support/LogicalResult.h"
 #include "mlir/Transforms/DialectConversion.h"
 
-#include "ttmlir/Conversion/TosaToTTIR/TosaToTTIR.h"
 #include "ttmlir/Dialect/TT/IR/TTOpsTypes.h"
 #include "ttmlir/Dialect/TTIR/IR/TTIROps.h"
 #include "ttmlir/Dialect/TTIR/IR/TTIRUtils.h"
@@ -195,10 +192,7 @@ public:
     auto outputType = mlir::cast<RankedTensorType>(
         this->getTypeConverter()->convertType(srcOp.getResult().getType()));
 
-    llvm::SmallVector<int32_t> newShape;
-    for (int64_t dim : outputType.getShape()) {
-      newShape.push_back(static_cast<int32_t>(dim));
-    }
+    llvm::SmallVector<int32_t> newShape(outputType.getShape());
     ArrayAttr newShapeAttr = rewriter.getI32ArrayAttr(newShape);
 
     ttir::utils::replaceOpWithNewDPSOp<ttir::ReshapeOp>(
